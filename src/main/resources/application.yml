@@ -2,27 +2,12 @@ spring:
   profiles:
     include:
       - aws
+#      - local
+      - prod
   servlet:
     multipart:
       max-file-size: 10MB
 
-  datasource:
-    url: jdbc:mysql://localhost:3307/S3_FILE_UPLOAD?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
-    username: ${MYSQL_USER}
-    password: ${MYSQL_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-    properties:
-      hibernate:
-        format-sql: true
-    database: mysql
-    generate-ddl: true
-    show-sql: true
-
-logging:
-  level:
-    org.hibernate.SQL: debug
-    org.hibernate.type: trace
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
