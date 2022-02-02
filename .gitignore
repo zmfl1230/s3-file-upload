@@ -39,3 +39,6 @@ out/
 
 ### S3
 application-aws.yml
+
+.DS_Store
+dev-tools/.env
