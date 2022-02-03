@@ -28,6 +28,7 @@ dependencies {
 	runtimeOnly 'mysql:mysql-connector-java'
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 	implementation 'io.findify:s3mock_2.13:0.2.6'
+	testImplementation 'com.h2database:h2'
 }
 
 tasks.named('test') {
