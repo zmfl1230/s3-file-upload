@@ -1,11 +1,13 @@
 package org.S3.FileUpload.util;
 
-import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.S3.FileUpload.domain.Content;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +29,7 @@ public class S3Uploader {
      * 4. 업로드된 파일의 S3 주소를 반환받습니다.
      */
 
-    private final AmazonS3 amazonS3Client;
+    private final AmazonS3Client amazonS3Client;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -35,12 +37,14 @@ public class S3Uploader {
     public String getFileUrl(String fileName) {
         return amazonS3Client.getUrl(bucket, fileName).toString();
     }
-    public String upload(MultipartFile multipartFile, String dirName) throws IOException {
+
+    public Content upload(MultipartFile multipartFile, String dirName) throws IOException {
         File uploadFile = covertFile(multipartFile)
                 .orElseThrow(() -> new IllegalArgumentException("File로 변환하는데 실패했습니다."));
 
         String fileName = dirName + "/" + uploadFile.getName();
-        return uploadS3(uploadFile, fileName);
+        String uri = uploadS3(uploadFile, fileName);
+        return createContentEntity(uri, fileName, multipartFile.getOriginalFilename(), multipartFile.getContentType());
     }
 
     private String uploadS3(File uploadFile, String fileName) {
@@ -79,6 +83,10 @@ public class S3Uploader {
         } else {
             log.info("파일이 삭제되지 못했습니다.");
         }
+    }
+
+    private Content createContentEntity(String originalFileName, String fileName, String fileUri, @Nullable String contentType) {
+        return new Content(originalFileName, fileName, fileUri, contentType);
     }
 }
 
