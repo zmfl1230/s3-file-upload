@@ -2,8 +2,8 @@ spring:
   profiles:
     include:
       - aws
-#      - local
-      - prod
+      - local
+#      - prod
   servlet:
     multipart:
       max-file-size: 10MB
