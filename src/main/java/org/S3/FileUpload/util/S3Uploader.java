@@ -9,8 +9,10 @@ import org.S3.FileUpload.domain.Content;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,6 +33,8 @@ public class S3Uploader {
 
     private final AmazonS3Client amazonS3Client;
 
+    private final EntityManager entityManager;
+
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
@@ -38,13 +42,16 @@ public class S3Uploader {
         return amazonS3Client.getUrl(bucket, fileName).toString();
     }
 
+    @Transactional
     public Content upload(MultipartFile multipartFile, String dirName) throws IOException {
         File uploadFile = covertFile(multipartFile)
                 .orElseThrow(() -> new IllegalArgumentException("File로 변환하는데 실패했습니다."));
 
         String fileName = dirName + "/" + uploadFile.getName();
         String uri = uploadS3(uploadFile, fileName);
-        return createContentEntity(uri, fileName, multipartFile.getOriginalFilename(), multipartFile.getContentType());
+        Content content = createContentEntity(uri, fileName, multipartFile.getOriginalFilename(), multipartFile.getContentType());
+        entityManager.persist(content);
+        return content;
     }
 
     private String uploadS3(File uploadFile, String fileName) {
