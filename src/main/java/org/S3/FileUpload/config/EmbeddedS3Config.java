@@ -18,7 +18,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 @Slf4j
-@Profile({"local"})
+@Profile({"local", "test"})
 @Configuration
 public class EmbeddedS3Config {
 
